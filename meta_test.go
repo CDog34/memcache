@@ -11,7 +11,7 @@ import (
 
 func TestMetaSetGet(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	k, v, f, ttl, ttlDelta, wait, ctx, nv := []byte("KIANA"), []byte("KASLANA"), uint32(114514), int64(300), int64(20), int64(2), context.Background(), []byte("KALLEN")
+	k, v, f, ttl, ttlDelta, wait, ctx, nv := []byte("KIANA"), []byte("KASLANA"), uint32(114514), uint64(300), uint64(20), uint64(2), context.Background(), []byte("KALLEN")
 
 	// Normal set
 	sr, err := c.MetaSet(ctx, k, v, MetaSetOptions{
@@ -101,7 +101,7 @@ func TestMetaSetGet(t *testing.T) {
 
 func TestMetaSetCAS(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	k, v, ctx, ttl := []byte("KASLANA"), []byte("KIANA"), context.Background(), int64(300)
+	k, v, ctx, ttl := []byte("KASLANA"), []byte("KIANA"), context.Background(), uint64(300)
 
 	gr, err := c.MetaGet(ctx, k, MetaGetOptions{
 		ReturnCasToken: true,
@@ -159,7 +159,7 @@ func TestAdvancedMeta(t *testing.T) {
 	}
 
 	t.Logf("First get: %+v", r)
-	if !r.Won || r.IsSentWon {
+	if !r.Won {
 		t.Error("Won fail")
 	}
 
@@ -168,7 +168,7 @@ func TestAdvancedMeta(t *testing.T) {
 		t.Error(err)
 	}
 	t.Logf("Second get: %+v", r2)
-	if r2.Won || !r2.IsSentWon {
+	if r2.Won {
 		t.Error("Sent Won fail")
 	}
 
@@ -197,7 +197,7 @@ func TestAdvancedMeta(t *testing.T) {
 
 func TestMetaArithmetic(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	ctx, k, iv, d, ttl := context.Background(), []byte("KALLEN"), uint64(20), uint64(11), int64(20)
+	ctx, k, iv, d, ttl := context.Background(), []byte("KALLEN"), uint64(20), uint64(11), uint64(20)
 	item, err := c.MetaArithmetic(ctx, k, MetaArithmeticOptions{
 		InitialValue:   iv,
 		NewWithTTL:     ttl,

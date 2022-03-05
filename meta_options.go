@@ -16,8 +16,8 @@ type MetaGetOptions struct {
 	ReturnValue      bool // return item value in <data block>
 	NoBump           bool // don't bump the item in the LRU
 
-	SetTTL                int64  // update remaining TTL
-	NewWithTTL            int64  // vivify on miss, takes TTL as a argument
+	SetTTL                uint64 // update remaining TTL
+	NewWithTTL            uint64 // vivify on miss, takes TTL as a argument
 	RequestRecacheWithTTL uint64 // if token is less than remaining TTL win for recache
 }
 
@@ -79,7 +79,7 @@ type MetaSetOptions struct {
 	SetFlag        uint32      // set client flags to token (32 bit unsigned numeric)
 	SetInvalidate  bool        // set-to-invalid if supplied CAS is older than item's CAS
 	Mode           MetaSetMode // mode switch to change behavior to add, replace, append, prepend
-	SetTTL         int64       // Time-To-Live for item, see "Expiration" above.
+	SetTTL         uint64      // Time-To-Live for item, see "Expiration" above.
 }
 
 func marshalMSOptions(mso MetaSetOptions) (fs []metaFlager) {
@@ -111,7 +111,7 @@ type MetaDeletOptions struct {
 	CasToken      casToken // compare and swap token
 	BinaryKey     bool     // interpret key as base64 encoded binary value (see metaget)
 	SetInvalidate bool     // mark as stale, bumps CAS.
-	SetTTL        int64    // updates TTL, only when paired with the SetInvalidate option
+	SetTTL        uint64   // updates TTL, only when paired with the SetInvalidate option
 }
 
 func marshalMDOptions(mdo MetaDeletOptions) (fs []metaFlager) {
@@ -145,8 +145,8 @@ type MetaArithmeticOptions struct {
 	ReturnTTL      bool     // return current TTL
 	ReturnValue    bool     // return new value
 
-	SetTTL       int64              // update TTL on success
-	NewWithTTL   int64              // auto create item on miss with supplied TTL
+	SetTTL       uint64             // update TTL on success
+	NewWithTTL   uint64             // auto create item on miss with supplied TTL
 	InitialValue uint64             // initial value to use if auto created after miss (default 0)
 	Delta        uint64             //  delta to apply (decimal unsigned 64-bit number, default 1)
 	Mode         MetaArithmeticMode // mode switch to change between incr and decr modes.

@@ -48,7 +48,7 @@ func obtainMetaFlagsResults(ss []string) (mr MetaResult, err error) {
 		case 's':
 			mr.Size, err = strconv.ParseUint(v, 10, 64)
 		case 't':
-			mr.TTL, err = strconv.ParseInt(v, 10, 64)
+			mr.TTL, err = strconv.ParseUint(v, 10, 64)
 		default:
 			err = fmt.Errorf("Invalid flag: %c", k)
 		}
@@ -121,8 +121,8 @@ func withValue() metaFlager {
 }
 
 // withVivify - N(token): vivify on miss, takes TTL as a argument
-func withVivify(token int64) metaFlager {
-	return metaFlag{k: "N", i: strconv.FormatInt(token, 10)}
+func withVivify(token uint64) metaFlager {
+	return metaFlag{k: "N", i: strconv.FormatUint(token, 10)}
 }
 
 // withRecache - R(token): if token is less than remaining TTL win for recache
@@ -131,8 +131,8 @@ func withRecache(token uint64) metaFlager {
 }
 
 // withSetTTL - T(token): update remaining TTL
-func withSetTTL(token int64) metaFlager {
-	return metaFlag{k: "T", i: strconv.FormatInt(token, 10)}
+func withSetTTL(token uint64) metaFlager {
+	return metaFlag{k: "T", i: strconv.FormatUint(token, 10)}
 }
 
 // withCompareCAS - C(token): compare CAS value when storing item

@@ -12,7 +12,7 @@ type MetaResult struct {
 	LastAccess uint64
 	Opaque     string
 	Size       uint64
-	TTL        int64
+	TTL        uint64
 	Value      []byte
 	Hit        bool
 	Won        bool
