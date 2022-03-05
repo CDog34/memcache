@@ -8,16 +8,15 @@ import (
 type MetaResult struct {
 	CasToken   casToken
 	Flags      uint32
-	Hit        bool
 	Key        string
 	LastAccess uint64
 	Opaque     string
 	Size       uint64
 	TTL        int64
 	Value      []byte
-	IsWon      bool
-	IsStale    bool
-	IsSentWon  bool
+	Hit        bool
+	Won        bool
+	Stale      bool
 
 	isNoOp bool
 }

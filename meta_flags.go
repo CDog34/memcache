@@ -23,11 +23,11 @@ func obtainMetaFlagsResults(ss []string) (mr MetaResult, err error) {
 		k, v := f[0], f[1:]
 		switch k {
 		case 'W':
-			mr.IsWon = true
+			mr.Won = true
 		case 'Z':
-			mr.IsSentWon = true
+			mr.Won = false
 		case 'X':
-			mr.IsStale = true
+			mr.Stale = true
 		case 'k':
 			mr.Key = v
 		case 'O':

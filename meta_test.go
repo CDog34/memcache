@@ -159,7 +159,7 @@ func TestAdvancedMeta(t *testing.T) {
 	}
 
 	t.Logf("First get: %+v", r)
-	if !r.IsWon || r.IsSentWon {
+	if !r.Won || r.IsSentWon {
 		t.Error("Won fail")
 	}
 
@@ -168,7 +168,7 @@ func TestAdvancedMeta(t *testing.T) {
 		t.Error(err)
 	}
 	t.Logf("Second get: %+v", r2)
-	if r2.IsWon || !r2.IsSentWon {
+	if r2.Won || !r2.IsSentWon {
 		t.Error("Sent Won fail")
 	}
 
