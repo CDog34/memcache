@@ -22,7 +22,7 @@ type MetaGetOptions struct {
 	RequestRecacheWithTTL uint64 // if token is less than remaining TTL win for recache
 }
 
-func marshalMGOptions(mgo MetaGetOptions) (fs []metaFlager) {
+func marshalMGOptions(mgo MetaGetOptions) (fs []metaFlag) {
 	if mgo.NewWithTTL != 0 {
 		fs = append(fs, withVivify(mgo.NewWithTTL))
 	}
@@ -83,7 +83,7 @@ type MetaSetOptions struct {
 	SetTTL         uint64      // Time-To-Live for item, see "Expiration" above.
 }
 
-func marshalMSOptions(mso MetaSetOptions) (fs []metaFlager) {
+func marshalMSOptions(mso MetaSetOptions) (fs []metaFlag) {
 	if len(mso.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
@@ -115,7 +115,7 @@ type MetaDeletOptions struct {
 	SetTTL        uint64   // updates TTL, only when paired with the SetInvalidate option
 }
 
-func marshalMDOptions(mdo MetaDeletOptions) (fs []metaFlager) {
+func marshalMDOptions(mdo MetaDeletOptions) (fs []metaFlag) {
 	if len(mdo.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
@@ -153,7 +153,7 @@ type MetaArithmeticOptions struct {
 	Mode         MetaArithmeticMode // mode switch to change between incr and decr modes.
 }
 
-func marshalMAOptions(mao MetaArithmeticOptions) (fs []metaFlager) {
+func marshalMAOptions(mao MetaArithmeticOptions) (fs []metaFlag) {
 	if mao.NewWithTTL != 0 {
 		fs = append(fs, withVivify(mao.NewWithTTL))
 	}
