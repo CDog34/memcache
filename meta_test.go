@@ -3,6 +3,7 @@ package memcache
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"os"
 	"strconv"
 	"testing"
@@ -12,7 +13,7 @@ import (
 func TestMetaSetGet(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
 
-	k, v := []byte("KIANA"), []byte("KASLANA")
+	k, v := "KIANA", []byte("KASLANA")
 	f := uint32(114514)
 	var ttl, ttlDelta, wait uint64 = 300, 20, 2
 	ctx := context.Background()
@@ -106,7 +107,7 @@ func TestMetaSetGet(t *testing.T) {
 
 func TestMetaSetCAS(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	k, v, ctx, ttl := []byte("KASLANA"), []byte("KIANA"), context.Background(), uint64(300)
+	k, v, ctx, ttl := "KASLANA", []byte("KIANA"), context.Background(), uint64(300)
 
 	gr, err := c.MetaGet(ctx, k, MetaGetOptions{
 		ReturnCasToken: true,
@@ -152,7 +153,7 @@ func TestMetaSetCAS(t *testing.T) {
 func TestAdvancedMeta(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
 	ctx := context.Background()
-	key := []byte("NEPTUNE_SEKAI_ICHIBAN_KAWAII")
+	key := "NEPTUNE_SEKAI_ICHIBAN_KAWAII"
 	value := []byte("https://www.bilibili.com/video/BV1zU4y1w7XE")
 
 	r, err := c.MetaGet(ctx, key, MetaGetOptions{
@@ -204,7 +205,7 @@ func TestMetaArithmetic(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
 
 	ctx := context.Background()
-	k := []byte("KALLEN")
+	k := "KALLEN"
 	var iv, d, ttl uint64 = 20, 11, 20
 
 	item, err := c.MetaArithmetic(ctx, k, MetaArithmeticOptions{
@@ -247,20 +248,20 @@ func TestMetaArithmetic(t *testing.T) {
 func TestBinaryKey(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
 	ctx := context.Background()
-	k, err := os.ReadFile("binaryKey.png")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err = c.MetaSet(ctx, k, []byte{}, MetaSetOptions{BinaryKey: true})
-	if err != nil {
-		t.Error(err)
-	}
-	_, err = c.MetaGet(ctx, k, MetaGetOptions{BinaryKey: true})
+
+	id := uint32(65432)
+	k := make([]byte, 4)
+	binary.BigEndian.PutUint32(k[:], id)
+
+	_, err := c.MetaSet(ctx, "", []byte{}, MetaSetOptions{BinaryKey: k})
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = c.MetaGet(ctx, k, MetaGetOptions{ReturnValue: true, BinaryKey: true})
+	_, err = c.MetaGet(ctx, "", MetaGetOptions{BinaryKey: k})
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = c.MetaGet(ctx, "", MetaGetOptions{BinaryKey: k, ReturnValue: true})
 	if err != nil {
 		t.Error("Binary Key Error.", err)
 	}

@@ -6,7 +6,6 @@ type casToken struct {
 }
 
 type MetaGetOptions struct {
-	BinaryKey        bool // interpret key as base64 encoded binary value
 	ReturnCasToken   bool // return item cas token
 	ReturnFlags      bool // return client flags token
 	ReturnHit        bool // return whether item has been hit before as a 0 or 1
@@ -15,6 +14,8 @@ type MetaGetOptions struct {
 	ReturnTTL        bool // return item TTL remaining in seconds (-1 for unlimited)
 	ReturnValue      bool // return item value in <data block>
 	NoBump           bool // don't bump the item in the LRU
+
+	BinaryKey []byte // interpret key as base64 encoded binary value
 
 	SetTTL                uint64 // update remaining TTL
 	NewWithTTL            uint64 // vivify on miss, takes TTL as a argument
@@ -25,7 +26,7 @@ func marshalMGOptions(mgo MetaGetOptions) (fs []metaFlager) {
 	if mgo.NewWithTTL != 0 {
 		fs = append(fs, withVivify(mgo.NewWithTTL))
 	}
-	if mgo.BinaryKey {
+	if len(mgo.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
 	if mgo.ReturnCasToken {
@@ -74,7 +75,7 @@ const (
 
 type MetaSetOptions struct {
 	CasToken       casToken    // compare and swap token
-	BinaryKey      bool        // interpret key as base64 encoded binary value (see metaget)
+	BinaryKey      []byte      // interpret key as base64 encoded binary value (see metaget)
 	ReturnCasToken bool        // return CAS value if successfully stored.
 	SetFlag        uint32      // set client flags to token (32 bit unsigned numeric)
 	SetInvalidate  bool        // set-to-invalid if supplied CAS is older than item's CAS
@@ -83,7 +84,7 @@ type MetaSetOptions struct {
 }
 
 func marshalMSOptions(mso MetaSetOptions) (fs []metaFlager) {
-	if mso.BinaryKey {
+	if len(mso.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
 	if mso.ReturnCasToken {
@@ -109,13 +110,13 @@ func marshalMSOptions(mso MetaSetOptions) (fs []metaFlager) {
 
 type MetaDeletOptions struct {
 	CasToken      casToken // compare and swap token
-	BinaryKey     bool     // interpret key as base64 encoded binary value (see metaget)
+	BinaryKey     []byte   // interpret key as base64 encoded binary value (see metaget)
 	SetInvalidate bool     // mark as stale, bumps CAS.
 	SetTTL        uint64   // updates TTL, only when paired with the SetInvalidate option
 }
 
 func marshalMDOptions(mdo MetaDeletOptions) (fs []metaFlager) {
-	if mdo.BinaryKey {
+	if len(mdo.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
 	if mdo.SetInvalidate {
@@ -140,7 +141,7 @@ const (
 
 type MetaArithmeticOptions struct {
 	CasToken       casToken // compare and swap token
-	BinaryKey      bool     // interpret key as base64 encoded binary value (see metaget)
+	BinaryKey      []byte   // interpret key as base64 encoded binary value (see metaget)
 	ReturnCasToken bool     // return current CAS value if successful.
 	ReturnTTL      bool     // return current TTL
 	ReturnValue    bool     // return new value
@@ -156,7 +157,7 @@ func marshalMAOptions(mao MetaArithmeticOptions) (fs []metaFlager) {
 	if mao.NewWithTTL != 0 {
 		fs = append(fs, withVivify(mao.NewWithTTL))
 	}
-	if mao.BinaryKey {
+	if len(mao.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
 	if mao.ReturnCasToken {
