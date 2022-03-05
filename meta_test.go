@@ -11,7 +11,12 @@ import (
 
 func TestMetaSetGet(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	k, v, f, ttl, ttlDelta, wait, ctx, nv := []byte("KIANA"), []byte("KASLANA"), uint32(114514), uint64(300), uint64(20), uint64(2), context.Background(), []byte("KALLEN")
+
+	k, v := []byte("KIANA"), []byte("KASLANA")
+	f := uint32(114514)
+	var ttl, ttlDelta, wait uint64 = 300, 20, 2
+	ctx := context.Background()
+	nv := []byte("KALLEN")
 
 	// Normal set
 	sr, err := c.MetaSet(ctx, k, v, MetaSetOptions{
@@ -197,7 +202,11 @@ func TestAdvancedMeta(t *testing.T) {
 
 func TestMetaArithmetic(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	ctx, k, iv, d, ttl := context.Background(), []byte("KALLEN"), uint64(20), uint64(11), uint64(20)
+
+	ctx := context.Background()
+	k := []byte("KALLEN")
+	var iv, d, ttl uint64 = 20, 11, 20
+
 	item, err := c.MetaArithmetic(ctx, k, MetaArithmeticOptions{
 		InitialValue:   iv,
 		NewWithTTL:     ttl,
