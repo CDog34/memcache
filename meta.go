@@ -8,7 +8,7 @@ import (
 type MetaResult struct {
 	CasToken   casToken
 	Flags      uint32
-	Hit        uint32
+	Hit        bool
 	Key        string
 	LastAccess uint64
 	Opaque     string

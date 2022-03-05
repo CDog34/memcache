@@ -466,10 +466,8 @@ func parseMetaResponse(r *bufio.Reader) (mr MetaResult, err error) {
 		return
 	}
 	if withValue {
-		s := size + len(crlf)
-		mr.Value = make([]byte, s)
-		_, err = io.ReadFull(r, mr.Value)
-		if err != nil {
+		mr.Value = make([]byte, size+len(crlf))
+		if _, err = io.ReadFull(r, mr.Value); err != nil {
 			return
 		}
 		mr.Value = mr.Value[:size]

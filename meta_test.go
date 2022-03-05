@@ -65,7 +65,7 @@ func TestMetaSetGet(t *testing.T) {
 		t.Error(err)
 	}
 	t.Logf("%+v", item)
-	if item.Hit != 1 {
+	if !item.Hit {
 		t.Error("Hit Incorrect")
 	}
 	if item.LastAccess != uint64(wait) {
