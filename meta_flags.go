@@ -40,7 +40,7 @@ func obtainMetaFlagsResults(ss []string) (mr MetaResult, err error) {
 		case 'l':
 			mr.LastAccess, err = strconv.ParseUint(v, 10, 64)
 		case 's':
-			mr.Size, err = strconv.ParseUint(v, 10, 64)
+			mr.Size, err = strconv.Atoi(v)
 		case 't':
 			mr.TTL, err = strconv.ParseInt(v, 10, 64)
 		default:

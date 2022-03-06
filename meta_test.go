@@ -54,7 +54,7 @@ func TestMetaSetGet(t *testing.T) {
 	if item.TTL != 300 {
 		t.Error("TTL Incorrect")
 	}
-	if item.Size != uint64(len(v)) {
+	if item.Size != len(v) {
 		t.Error("Size Incorrect")
 	}
 
