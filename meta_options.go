@@ -17,47 +17,47 @@ type MetaGetOptions struct {
 
 	BinaryKey []byte // interpret key as base64 encoded binary value
 
-	SetTTL                uint64 // update remaining TTL
-	NewWithTTL            uint64 // vivify on miss, takes TTL as a argument
-	RequestRecacheWithTTL uint64 // if token is less than remaining TTL win for recache
+	SetTTL         uint64 // update remaining TTL
+	NewWithTTL     uint64 // vivify on miss, takes TTL as a argument
+	RecacheWithTTL uint64 // if token is less than remaining TTL win for recache
 }
 
-func marshalMGOptions(mgo MetaGetOptions) (fs []metaFlag) {
-	if mgo.NewWithTTL != 0 {
-		fs = append(fs, withVivify(mgo.NewWithTTL))
+func (o MetaGetOptions) marshal() (fs []metaFlag) {
+	if o.NewWithTTL != 0 {
+		fs = append(fs, withVivify(o.NewWithTTL))
 	}
-	if len(mgo.BinaryKey) > 0 {
+	if len(o.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
-	if mgo.ReturnCasToken {
+	if o.ReturnCasToken {
 		fs = append(fs, withCAS())
 	}
-	if mgo.ReturnFlags {
+	if o.ReturnFlags {
 		fs = append(fs, withFlag())
 	}
-	if mgo.ReturnHit {
+	if o.ReturnHit {
 		fs = append(fs, withHit())
 	}
-	if mgo.ReturnLastAccess {
+	if o.ReturnLastAccess {
 		fs = append(fs, withLastAccess())
 	}
-	if mgo.ReturnSize {
+	if o.ReturnSize {
 		fs = append(fs, withSize())
 	}
-	if mgo.ReturnTTL {
+	if o.ReturnTTL {
 		fs = append(fs, withTTL())
 	}
-	if mgo.ReturnValue {
+	if o.ReturnValue {
 		fs = append(fs, withValue())
 	}
-	if mgo.NoBump {
+	if o.NoBump {
 		fs = append(fs, withNoBump())
 	}
-	if mgo.SetTTL != 0 {
-		fs = append(fs, withSetTTL(mgo.SetTTL))
+	if o.SetTTL != 0 {
+		fs = append(fs, withSetTTL(o.SetTTL))
 	}
-	if mgo.RequestRecacheWithTTL != 0 {
-		fs = append(fs, withRecache(mgo.RequestRecacheWithTTL))
+	if o.RecacheWithTTL != 0 {
+		fs = append(fs, withRecache(o.RecacheWithTTL))
 	}
 	return
 }
@@ -83,27 +83,27 @@ type MetaSetOptions struct {
 	SetTTL         uint64      // Time-To-Live for item, see "Expiration" above.
 }
 
-func marshalMSOptions(mso MetaSetOptions) (fs []metaFlag) {
-	if len(mso.BinaryKey) > 0 {
+func (o MetaSetOptions) marshal() (fs []metaFlag) {
+	if len(o.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
-	if mso.ReturnCasToken {
+	if o.ReturnCasToken {
 		fs = append(fs, withCAS())
 	}
-	if mso.SetFlag != 0 {
-		fs = append(fs, withSetFlag(mso.SetFlag))
+	if o.SetFlag != 0 {
+		fs = append(fs, withSetFlag(o.SetFlag))
 	}
-	if mso.SetInvalidate {
+	if o.SetInvalidate {
 		fs = append(fs, withSetInvalid())
 	}
-	if mso.Mode != MetaSetModeEmpty {
-		fs = append(fs, withMode(string(mso.Mode)))
+	if o.Mode != MetaSetModeEmpty {
+		fs = append(fs, withMode(string(o.Mode)))
 	}
-	if mso.SetTTL != 0 {
-		fs = append(fs, withSetTTL(mso.SetTTL))
+	if o.SetTTL != 0 {
+		fs = append(fs, withSetTTL(o.SetTTL))
 	}
-	if mso.CasToken.setted {
-		fs = append(fs, withCompareCAS(mso.CasToken.value))
+	if o.CasToken.setted {
+		fs = append(fs, withCompareCAS(o.CasToken.value))
 	}
 	return
 }
@@ -115,18 +115,18 @@ type MetaDeletOptions struct {
 	SetTTL        uint64   // updates TTL, only when paired with the SetInvalidate option
 }
 
-func marshalMDOptions(mdo MetaDeletOptions) (fs []metaFlag) {
-	if len(mdo.BinaryKey) > 0 {
+func (o MetaDeletOptions) marshal() (fs []metaFlag) {
+	if len(o.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
-	if mdo.SetInvalidate {
+	if o.SetInvalidate {
 		fs = append(fs, withSetInvalid())
 	}
-	if mdo.SetTTL != 0 {
-		fs = append(fs, withSetTTL(mdo.SetTTL))
+	if o.SetTTL != 0 {
+		fs = append(fs, withSetTTL(o.SetTTL))
 	}
-	if mdo.CasToken.setted {
-		fs = append(fs, withCompareCAS(mdo.CasToken.value))
+	if o.CasToken.setted {
+		fs = append(fs, withCompareCAS(o.CasToken.value))
 	}
 	return
 }
@@ -146,43 +146,44 @@ type MetaArithmeticOptions struct {
 	ReturnTTL      bool     // return current TTL
 	ReturnValue    bool     // return new value
 
-	SetTTL       uint64             // update TTL on success
-	NewWithTTL   uint64             // auto create item on miss with supplied TTL
-	InitialValue uint64             // initial value to use if auto created after miss (default 0)
-	Delta        uint64             //  delta to apply (decimal unsigned 64-bit number, default 1)
-	Mode         MetaArithmeticMode // mode switch to change between incr and decr modes.
+	SetTTL       uint64 // update TTL on success
+	NewWithTTL   uint64 // auto create item on miss with supplied TTL
+	InitialValue uint64 // initial value to use if auto created after miss (default 0)
+	Delta        uint64 //  delta to apply (decimal unsigned 64-bit number, default 1)
+
+	Mode MetaArithmeticMode // mode switch to change between incr and decr modes.
 }
 
-func marshalMAOptions(mao MetaArithmeticOptions) (fs []metaFlag) {
-	if mao.NewWithTTL != 0 {
-		fs = append(fs, withVivify(mao.NewWithTTL))
+func (o MetaArithmeticOptions) marshal() (fs []metaFlag) {
+	if o.NewWithTTL != 0 {
+		fs = append(fs, withVivify(o.NewWithTTL))
 	}
-	if len(mao.BinaryKey) > 0 {
+	if len(o.BinaryKey) > 0 {
 		fs = append(fs, withBinary())
 	}
-	if mao.ReturnCasToken {
+	if o.ReturnCasToken {
 		fs = append(fs, withCAS())
 	}
-	if mao.Delta != 0 {
-		fs = append(fs, withDelta(mao.Delta))
+	if o.Delta != 0 {
+		fs = append(fs, withDelta(o.Delta))
 	}
-	if mao.InitialValue != 0 {
-		fs = append(fs, withInitialValue(mao.InitialValue))
+	if o.InitialValue != 0 {
+		fs = append(fs, withInitialValue(o.InitialValue))
 	}
-	if mao.ReturnTTL {
+	if o.ReturnTTL {
 		fs = append(fs, withTTL())
 	}
-	if mao.ReturnValue {
+	if o.ReturnValue {
 		fs = append(fs, withValue())
 	}
-	if mao.Mode != MetaArithmeticModeEmpty {
-		fs = append(fs, withMode(string(mao.Mode)))
+	if o.Mode != MetaArithmeticModeEmpty {
+		fs = append(fs, withMode(string(o.Mode)))
 	}
-	if mao.SetTTL != 0 {
-		fs = append(fs, withSetTTL(mao.SetTTL))
+	if o.SetTTL != 0 {
+		fs = append(fs, withSetTTL(o.SetTTL))
 	}
-	if mao.CasToken.setted {
-		fs = append(fs, withCompareCAS(mao.CasToken.value))
+	if o.CasToken.setted {
+		fs = append(fs, withCompareCAS(o.CasToken.value))
 	}
 	return
 }
