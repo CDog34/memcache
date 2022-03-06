@@ -13,17 +13,16 @@ import (
 func TestMetaSetGet(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
 
+	ctx := context.Background()
 	k, v := "KIANA", []byte("KASLANA")
 	f := uint32(114514)
-	var ttl, ttlDelta, wait uint64 = 300, 20, 2
-	ctx := context.Background()
 	nv := []byte("KALLEN")
 
 	// Normal set
 	sr, err := c.MetaSet(ctx, k, v, MetaSetOptions{
 		ReturnCasToken: true,
 		SetFlag:        f,
-		SetTTL:         ttl,
+		SetTTL:         300,
 	})
 	if err != nil {
 		t.Error(err)
@@ -38,12 +37,11 @@ func TestMetaSetGet(t *testing.T) {
 		ReturnSize:     true,
 		ReturnTTL:      true,
 		ReturnValue:    true,
-		SetTTL:         ttl + ttlDelta,
+		SetTTL:         320,
 	})
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%+v", item)
 	if !bytes.Equal(item.Value, v) {
 		t.Error("Value Incorrect")
 	}
@@ -53,7 +51,7 @@ func TestMetaSetGet(t *testing.T) {
 	if item.Flags != f {
 		t.Error("Flag Incorrect")
 	}
-	if item.TTL != ttl {
+	if item.TTL != 300 {
 		t.Error("TTL Incorrect")
 	}
 	if item.Size != uint64(len(v)) {
@@ -61,7 +59,7 @@ func TestMetaSetGet(t *testing.T) {
 	}
 
 	// Hit, LastAccess, SetTTL
-	time.Sleep(time.Duration(wait) * time.Second)
+	time.Sleep(2 * time.Second)
 	item, err = c.MetaGet(ctx, k, MetaGetOptions{
 		ReturnHit:        true,
 		ReturnLastAccess: true,
@@ -70,14 +68,13 @@ func TestMetaSetGet(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%+v", item)
 	if !item.Hit {
 		t.Error("Hit Incorrect")
 	}
-	if item.LastAccess != uint64(wait) {
+	if item.LastAccess != 2 {
 		t.Error("LastAccess Incorrect")
 	}
-	if item.TTL != ttl+ttlDelta-wait {
+	if item.TTL != 300+20-2 {
 		t.Error("SetTTL Incorrect")
 	}
 
@@ -87,7 +84,6 @@ func TestMetaSetGet(t *testing.T) {
 		t.Error(err)
 	}
 	item, err = c.MetaGet(ctx, k, MetaGetOptions{ReturnValue: true, ReturnCasToken: true})
-	t.Logf("%+v", item)
 	if err != nil {
 		t.Error(err)
 	}
@@ -107,18 +103,17 @@ func TestMetaSetGet(t *testing.T) {
 
 func TestMetaSetCAS(t *testing.T) {
 	c, _ := New(os.Getenv("MC_ADDRESS"), 2, 100)
-	k, v, ctx, ttl := "KASLANA", []byte("KIANA"), context.Background(), uint64(300)
+	k, v, ctx := "KASLANA", []byte("KIANA"), context.Background()
 
 	gr, err := c.MetaGet(ctx, k, MetaGetOptions{
 		ReturnCasToken: true,
-		NewWithTTL:     ttl,
+		NewWithTTL:     300,
 		ReturnTTL:      true,
 	})
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%+v", gr)
-	if gr.TTL != ttl {
+	if gr.TTL != 300 {
 		t.Error("NewWithTTL Error")
 	}
 
@@ -144,7 +139,6 @@ func TestMetaSetCAS(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("%q", item.Value)
 	if !bytes.Equal(item.Value, v) {
 		t.Error("Value Incorrect")
 	}
@@ -164,7 +158,6 @@ func TestAdvancedMeta(t *testing.T) {
 		t.Error(err)
 	}
 
-	t.Logf("First get: %+v", r)
 	if !r.Won {
 		t.Error("Won fail")
 	}
@@ -173,7 +166,6 @@ func TestAdvancedMeta(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("Second get: %+v", r2)
 	if r2.Won {
 		t.Error("Sent Won fail")
 	}
@@ -186,7 +178,6 @@ func TestAdvancedMeta(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Logf("Set response: %+v", r)
 
 	item, err := c.MetaGet(context.Background(), key,
 		MetaGetOptions{
@@ -198,7 +189,6 @@ func TestAdvancedMeta(t *testing.T) {
 	if !bytes.Equal(item.Value, value) {
 		t.Error("Set/Get failed")
 	}
-	t.Logf("Final get: %+v", item)
 }
 
 func TestMetaArithmetic(t *testing.T) {
